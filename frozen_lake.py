@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def run_frozen_lake(name_of_save_file, episodes, seed, legend_label, learning_rate_a = 0.9, discount_factor_g = 0.9, epsilon=1, slippery=False, strategy="greedy", is_training=True, render=False):
+def run_frozen_lake(name_of_save_file, episodes, seed, learning_rate_a = 0.9, discount_factor_g = 0.9, epsilon=1, tau = 1.0, slippery=False, strategy="greedy", is_training=True, render=False):
    env = gym.make(
       'FrozenLake-v1',            
       map_name="8x8", 
@@ -39,7 +39,6 @@ def run_frozen_lake(name_of_save_file, episodes, seed, legend_label, learning_ra
 
          elif strategy == "boltzman":
             if is_training and rng.random() < epsilon:
-               tau = 1.0
                action = rng.choice(env.action_space.n, p=np.exp(q[state, :] / tau) / np.sum(np.exp(q[state, :] / tau)))
             else:
                action = np.argmax(q[state,:])
@@ -66,8 +65,7 @@ def run_frozen_lake(name_of_save_file, episodes, seed, legend_label, learning_ra
    sum_rewards = np.zeros(episodes)
    for t in range(episodes):
       sum_rewards[t] = np.sum(rewards_per_episode[max(0, t-100):(t+1)])
-   plt.plot(sum_rewards, label=legend_label)
-   plt.savefig(name_of_save_file + ".png")
+   plt.plot(sum_rewards)
 
    if is_training:
       f = open(name_of_save_file + ".pkl","wb")
